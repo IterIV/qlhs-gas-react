@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import moment from "moment";
-import Spinner from "./Spinner";
-export default function Table({ header = [], data, ...props }) {
+export default function Table({ header = [], data = [], loading, limit }) {
   const renderData = (data, header, count) => {
     if (header.name === "ngayNhan" || header.name === "ngayTra") {
       return moment(data[header.name]).format("DD/MM/YYYY");
@@ -14,7 +13,32 @@ export default function Table({ header = [], data, ...props }) {
     }
     return data[header.name];
   };
+  const renderPadging = () => {
+    if (data.length > limit) {
+    }
+  };
   const renderTableItem = () => {
+    console.log(loading);
+    if (loading) {
+      return (
+        <Loading>
+          <TableItem>
+            {header.map((item, index) => (
+              <TableCell size={item.size} key={`header_${index}`}>
+                <p></p>
+              </TableCell>
+            ))}
+          </TableItem>
+        </Loading>
+      );
+    }
+    if (data.length === 0 && !loading) {
+      return (
+        <NoItem>
+          <p>Không có dữ liệu</p>
+        </NoItem>
+      );
+    }
     return data.map((item, count) => (
       <TableItem key={`${item.id}`}>
         {header.map((iHeader, index) => (
@@ -38,17 +62,12 @@ export default function Table({ header = [], data, ...props }) {
           </TableCell>
         ))}
       </div>
-      <TableContent>
-        <Loading>
-          <Spinner size="20" color="white" />
-        </Loading>
-        {renderTableItem()}
-      </TableContent>
+      <TableContent>{renderTableItem()}</TableContent>
+      <Padging></Padging>
     </Container>
   );
 }
 const Container = styled.div`
-  max-height: 400px;
   overflow-y: auto;
   .table__header {
     display: flex;
@@ -71,7 +90,7 @@ const TableItem = styled.div`
   display: flex;
   margin: 10px 0;
   padding: 20px 15px;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   border-radius: 10px;
   cursor: pointer;
   transition: 0.3s;
@@ -82,11 +101,27 @@ const TableItem = styled.div`
 const TableContent = styled.div`
   position: relative;
 `;
-const Loading = styled.div`
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.4);
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+const NoItem = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 10px;
 `;
+
+const Loading = styled.div`
+  p {
+    height: 13px;
+    animation: skeleton-loading 1s linear infinite alternate;
+  }
+  @keyframes skeleton-loading {
+    0% {
+      background-color: hsl(200, 20%, 70%);
+    }
+    100% {
+      background-color: hsl(200, 20%, 95%);
+    }
+  }
+`;
+const Padging = styled.div``;

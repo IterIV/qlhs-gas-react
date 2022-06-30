@@ -63,9 +63,8 @@ export default function DesignNew() {
   ];
   const dispatch = useDispatch();
   const { authData } = useSelector((state) => state.authReducer);
-  const { arrData } = useSelector((state) => state.designReducer);
+  const { arrData, loading } = useSelector((state) => state.designReducer);
   useEffect(() => {
-    // const data = localStorage.getItem("user");
     if (authData && authData.token) {
       dispatch(getNewDesignAction(authData.token));
     }
@@ -73,10 +72,10 @@ export default function DesignNew() {
   return (
     <Container>
       <p className="header">
-        Hồ thẩm duyệt sơ mới{" "}
+        Hồ thẩm duyệt sơ mới
         <span className="header__badge">{`${arrData.length} hồ sơ`}</span>
       </p>
-      <Table header={headerNew} data={arrData} />
+      <Table header={headerNew} data={arrData} loading={loading} limit={5} />
     </Container>
   );
 }
@@ -85,6 +84,7 @@ const Container = styled.div`
   height: 100vh;
   padding-left: 280px;
   padding-top: 90px;
+  background-color: #fcfdff;
   .header {
     font-weight: 600;
     font-size: 18px;

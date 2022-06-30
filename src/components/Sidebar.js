@@ -10,28 +10,28 @@ export default function Sidebar() {
     {
       title: "Tổng quan",
       path: "dashboard",
-      icon: "dashboard"
+      icon: "dashboard",
     },
     {
       title: "Hồ sơ thẩm duyệt",
       path: "",
-      icon: ""
+      icon: "",
     },
     {
       title: "Phân công hồ sơ",
       path: "design/new",
-      icon: "library_add"
+      icon: "library_add",
     },
     {
       title: "Đang thụ lý",
       path: "design/inprocess",
-      icon: "dashboard"
+      icon: "dashboard",
     },
     {
       title: "Hoàn thành",
       path: "design/finish",
-      icon: "dashboard"
-    }
+      icon: "dashboard",
+    },
   ];
   return (
     <Container>
@@ -82,7 +82,7 @@ const Container = styled.div`
   .user {
     display: flex;
     align-items: center;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     margin: 20px 0;
     border: 1px solid #ddd;
