@@ -1,82 +1,91 @@
 import styled from "styled-components";
 import moment from "moment";
-export default function Table({ header = [], data = [], loading, limit }) {
-  const renderData = (data, header, count) => {
-    if (header.name === "ngayNhan" || header.name === "ngayTra") {
-      return moment(data[header.name]).format("DD/MM/YYYY");
-    }
-    if (header.name === "") {
-      return header.render({ ...data });
-    }
-    if (header.name === "index") {
-      return count + 1;
-    }
-    return data[header.name];
-  };
-  const renderPadging = () => {
-    if (data.length > limit) {
-    }
-  };
-  const renderTableItem = () => {
-    console.log(loading);
-    if (loading) {
-      return (
-        <Loading>
-          <TableItem>
-            {header.map((item, index) => (
-              <TableCell size={item.size} key={`header_${index}`}>
-                <p></p>
-              </TableCell>
-            ))}
-          </TableItem>
-        </Loading>
-      );
-    }
-    if (data.length === 0 && !loading) {
-      return (
-        <NoItem>
-          <p>Không có dữ liệu</p>
-        </NoItem>
-      );
-    }
-    return data.map((item, count) => (
-      <TableItem key={`${item.id}`}>
-        {header.map((iHeader, index) => (
-          <TableCell
-            size={iHeader.size}
-            key={`${item.id}_${index}`}
-            className={`${index === 0 ? "first" : ""}`}
-          >
-            {renderData(item, iHeader, count)}
-          </TableCell>
-        ))}
-      </TableItem>
+
+const initHeaders = [
+  {
+    title: "",
+    name: "",
+    size: 0,
+  },
+];
+
+export default function Table({
+  headers = initHeaders,
+  data = [],
+  loading,
+  limit,
+}) {
+  const renderHeader = () => {
+    return headers.map((header) => (
+      <TableCell size={header.size}>{header?.title}</TableCell>
     ));
   };
+
+  const renderLoading = () => {
+    return (
+      <Loading>
+        <TableRow>
+          {headers.map((header) => (
+            <TableCell size={header.size}></TableCell>
+          ))}
+        </TableRow>
+      </Loading>
+    );
+  };
+  const renderNoItem = () => {
+    return (
+      <NoItem>
+        <p>Không có dữ liệu</p>
+      </NoItem>
+    );
+  };
+  const renderCells = (obj) => {
+    return headers.map((header, index) => {
+      if ("render" in header) {
+        return header.render(obj);
+      }
+      return (
+        <TableCell key={`cell_${index}`} size={header.size}>
+          <p>{obj[header.name]}</p>
+        </TableCell>
+      );
+    });
+  };
+
+  const renderData = () => {
+    return data.map((obj, index) => {
+      return <TableRow key={`item__${index}`}>{renderCells(obj)}</TableRow>;
+    });
+  };
+
+  const renderTableContent = () => {
+    if (loading) {
+      return renderLoading();
+    }
+    if (data.length === 0 && !loading) {
+      return renderNoItem();
+    }
+    return renderData();
+  };
+
   return (
     <Container>
-      <div className="table__header">
-        {header.map((item, index) => (
-          <TableCell size={item.size} key={`header_${index}`}>
-            {item.title}
-          </TableCell>
-        ))}
-      </div>
-      <TableContent>{renderTableItem()}</TableContent>
+      <TableHeader>{renderHeader()}</TableHeader>
+      <TableContent>{renderTableContent()}</TableContent>
       <Padging></Padging>
     </Container>
   );
 }
 const Container = styled.div`
   overflow-y: auto;
-  .table__header {
-    display: flex;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 13px;
-    opacity: 0.6;
-    padding: 10px;
-  }
+`;
+const TableHeader = styled.div`
+  display: flex;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 13px;
+  opacity: 0.6;
+  padding: 10px;
 `;
 const TableCell = styled.div`
   width: ${(props) => `${props.size}%`};
@@ -86,7 +95,7 @@ const TableCell = styled.div`
     color: #275b9a;
   }
 `;
-const TableItem = styled.div`
+const TableRow = styled.div`
   display: flex;
   margin: 10px 0;
   padding: 20px 15px;
@@ -111,9 +120,11 @@ const NoItem = styled.div`
 `;
 
 const Loading = styled.div`
-  p {
-    height: 13px;
+  ${TableCell} {
     animation: skeleton-loading 1s linear infinite alternate;
+    height: 10px;
+    margin: 0 2px;
+    border-radius: 5px;
   }
   @keyframes skeleton-loading {
     0% {

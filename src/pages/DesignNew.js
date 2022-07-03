@@ -1,11 +1,24 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { getNewDesignAction } from "../actions/DesignActions";
 import ButtonIcon from "../components/Button/ButtonIcon";
 import Table from "../components/Table";
+import Modal from "../components/Modal";
+
 export default function DesignNew() {
-  const headerNew = [
+  const { authData } = useSelector((state) => state.authReducer);
+  const { arrData, loading } = useSelector((state) => state.designReducer);
+  const { showModal, setShowModal } = useState(false);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (authData && authData.token) {
+      dispatch(getNewDesignAction(authData.token));
+    }
+  }, [authData, dispatch]);
+
+  const headers = [
     {
       title: "STT",
       name: "index",
@@ -40,45 +53,36 @@ export default function DesignNew() {
       title: "",
       name: "",
       size: "10",
-      render: ({ id }) => {
+      render: (obj) => {
         return (
           <>
             <ButtonIcon
               icon="person_add"
               onClick={() => {
-                console.log(id);
+                setShowModal((prev) => true);
               }}
             />
-            <ButtonIcon
-              icon="delete"
-              color="danger"
-              onClick={() => {
-                console.log(id);
-              }}
-            />
+            <ButtonIcon icon="delete" color="danger" />
           </>
         );
       },
     },
   ];
-  const dispatch = useDispatch();
-  const { authData } = useSelector((state) => state.authReducer);
-  const { arrData, loading } = useSelector((state) => state.designReducer);
-  useEffect(() => {
-    if (authData && authData.token) {
-      dispatch(getNewDesignAction(authData.token));
-    }
-  }, [authData, dispatch]);
+
   return (
     <Container>
       <p className="header">
         Hồ thẩm duyệt sơ mới
         <span className="header__badge">{`${arrData.length} hồ sơ`}</span>
       </p>
-      <Table header={headerNew} data={arrData} loading={loading} limit={5} />
+      <Table headers={headers} data={arrData} loading={loading} limit={5} />
+      <Modal show={showModal} setShow={setShowModal}>
+        Hoàn thành
+      </Modal>
     </Container>
   );
 }
+
 const Container = styled.div`
   width: 100vw;
   height: 100vh;
