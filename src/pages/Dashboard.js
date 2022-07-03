@@ -1,3 +1,3 @@
 export default function Dashboard() {
-  return <div> Dashboard</div>;
+  return <div style={{ marginTop: "100px", paddingLeft: "300px" }}></div>;
 }

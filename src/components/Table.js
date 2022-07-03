@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import moment from "moment";
 
 const initHeaders = [
   {
@@ -16,8 +15,10 @@ export default function Table({
   limit,
 }) {
   const renderHeader = () => {
-    return headers.map((header) => (
-      <TableCell size={header.size}>{header?.title}</TableCell>
+    return headers.map((header, index) => (
+      <TableCell size={header.size} key={`header__${index}`}>
+        {header?.title}
+      </TableCell>
     ));
   };
 
@@ -25,8 +26,8 @@ export default function Table({
     return (
       <Loading>
         <TableRow>
-          {headers.map((header) => (
-            <TableCell size={header.size}></TableCell>
+          {headers.map((header, index) => (
+            <TableCell size={header.size} key={`loading__${index}`}></TableCell>
           ))}
         </TableRow>
       </Loading>
@@ -39,10 +40,21 @@ export default function Table({
       </NoItem>
     );
   };
-  const renderCells = (obj) => {
+  const renderCells = (obj, i) => {
     return headers.map((header, index) => {
       if ("render" in header) {
-        return header.render(obj);
+        return (
+          <TableCell key={`cell_${index}`} size={header.size}>
+            {header.render(obj)}
+          </TableCell>
+        );
+      }
+      if (header.name === "index") {
+        return (
+          <TableCell key={`cell_${index}`} size={header.size}>
+            {i + 1}
+          </TableCell>
+        );
       }
       return (
         <TableCell key={`cell_${index}`} size={header.size}>
@@ -54,7 +66,9 @@ export default function Table({
 
   const renderData = () => {
     return data.map((obj, index) => {
-      return <TableRow key={`item__${index}`}>{renderCells(obj)}</TableRow>;
+      return (
+        <TableRow key={`item__${index}`}>{renderCells(obj, index)}</TableRow>
+      );
     });
   };
 
@@ -101,7 +115,6 @@ const TableRow = styled.div`
   padding: 20px 15px;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   border-radius: 10px;
-  cursor: pointer;
   transition: 0.3s;
   &:hover {
     background-color: #f4f4f4;
