@@ -1,6 +1,17 @@
 import styled from "styled-components";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import GridViewIcon from "@mui/icons-material/GridView";
+import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
+import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
+import DoneAllOutlinedIcon from "@mui/icons-material/DoneAllOutlined";
+import {
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+} from "@mui/material";
 export default function Sidebar() {
   const location = useLocation();
   const { image, lastName } = useSelector(
@@ -8,29 +19,34 @@ export default function Sidebar() {
   );
   const lstMenu = [
     {
-      title: "Tổng quan",
-      path: "dashboard",
-      icon: "dashboard",
+      header: "Tổng quan",
+      items: [
+        {
+          title: "Tổng quan",
+          path: "dashboard",
+          icon: <GridViewIcon />,
+        },
+      ],
     },
     {
-      title: "Hồ sơ thẩm duyệt",
-      path: "",
-      icon: "",
-    },
-    {
-      title: "Phân công hồ sơ",
-      path: "design/new",
-      icon: "library_add",
-    },
-    {
-      title: "Đang thụ lý",
-      path: "design/inprocess",
-      icon: "dashboard",
-    },
-    {
-      title: "Hoàn thành",
-      path: "design/finish",
-      icon: "dashboard",
+      header: "Hồ sơ thẩm duyệt",
+      items: [
+        {
+          title: "Phân công hồ sơ",
+          path: "design/new",
+          icon: <GroupAddOutlinedIcon />,
+        },
+        {
+          title: "Đang thụ lý",
+          path: "design/inprocess",
+          icon: <InsightsOutlinedIcon />,
+        },
+        {
+          title: "Hoàn thành",
+          path: "design/finish",
+          icon: <DoneAllOutlinedIcon />,
+        },
+      ],
     },
   ];
   return (
@@ -42,25 +58,46 @@ export default function Sidebar() {
         <img src={image ? image : ""} alt={lastName ? lastName : ""} />
         <p>{lastName ? lastName : ""}</p>
       </div>
-      <ul className="menu">
-        {lstMenu.map((item, index) =>
-          item.path === "" ? (
-            <p className="menu__header" key={`menu__${index}`}>
-              {item.title}
-            </p>
-          ) : (
-            <li
-              className={`menu__item ${
-                location.pathname === `/home/${item.path}` ? "active" : ""
-              }`}
-              key={`menu__${index}`}
-            >
-              <span className="material-symbols-outlined">{item.icon}</span>
-              <Link to={item.path}>{item.title}</Link>
-            </li>
-          )
-        )}
-      </ul>
+      {lstMenu.map((menu, index) => (
+        <List
+          sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+          component="nav"
+          key={`header_${index}`}
+          subheader={
+            <ListSubheader component="div">{menu.header}</ListSubheader>
+          }
+        >
+          {menu.items.map((item, index1) => {
+            return (
+              <ListItemButton key={`h${index}_item${index1}`}>
+                <ListItemIcon
+                  sx={
+                    location.pathname === `/home/${item.path}`
+                      ? { color: "#275b9a" }
+                      : {}
+                  }
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Link
+                      className={
+                        location.pathname === `/home/${item.path}`
+                          ? "active"
+                          : ""
+                      }
+                      to={item.path}
+                    >
+                      {item.title}
+                    </Link>
+                  }
+                />
+              </ListItemButton>
+            );
+          })}
+        </List>
+      ))}
     </Container>
   );
 }
@@ -105,43 +142,24 @@ const Container = styled.div`
       color: #2971bd;
     }
   }
-  .menu {
-    margin-top: 15px;
-    .menu__header {
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: 10px;
-      margin: 5px 0;
-    }
+  .MuiListSubheader-gutters {
+    position: relative;
   }
 
-  .menu__item {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    margin: 20px 0;
-    transition: all 0.5;
-    span {
-      font-size: 18px;
-      color: #979797;
-      transition: all 0.5;
-    }
+  .MuiListItemButton-gutters .css-tlelie-MuiListItemText-root {
     a {
       text-decoration: none;
-      margin-left: 10px;
       color: #979797;
       transition: 0.5;
-      font-size: 14px;
-      font-weight: 400;
       transition: all 0.5;
-    }
-    &:hover,
-    &.active {
-      a,
-      span {
+      &.active {
         color: #275b9a;
         font-weight: 700;
       }
+    }
+    &:hover {
+      color: #275b9a;
+      font-weight: 700;
     }
   }
 `;

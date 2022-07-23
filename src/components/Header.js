@@ -1,6 +1,10 @@
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
+import Button from "@mui/material/Button";
+import LogoutIcon from "@mui/icons-material/Logout";
+
 import { logoutAction } from "../actions/AuthActions";
+
 export default function Header() {
   const dispatch = useDispatch();
   const handleLogOut = () => {
@@ -12,7 +16,14 @@ export default function Header() {
         <span className="material-symbols-outlined">menu</span>
       </div>
       <div className="header__right">
-        <button onClick={handleLogOut}>Lout Out</button>
+        <Button
+          variant="outlined"
+          color="error"
+          startIcon={<LogoutIcon />}
+          onClick={handleLogOut}
+        >
+          Đăng xuất
+        </Button>
       </div>
     </Container>
   );

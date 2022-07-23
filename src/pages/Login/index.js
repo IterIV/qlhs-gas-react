@@ -5,6 +5,7 @@ import Button from "../../components/Button/Button";
 import Input from "../../components/Input";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import LoadingButton from "@mui/lab/LoadingButton";
 import styled from "styled-components";
 export default function Login() {
   const { loading, error, messageError } = useSelector(
@@ -67,7 +68,16 @@ export default function Login() {
             }
           />
           {error ? <p>{messageError}</p> : null}
-          <Button type="submit" loading={loading} title="Đăng nhập" full />
+          <LoadingButton
+            loading={loading}
+            loadingIndicator="Đang kết nối..."
+            fullWidth
+            type="submit"
+            variant="contained"
+            size="large"
+          >
+            Đăng nhập
+          </LoadingButton>
         </form>
       </div>
     </Container>
