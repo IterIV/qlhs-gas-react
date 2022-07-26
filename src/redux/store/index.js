@@ -1,10 +1,10 @@
 import {
   legacy_createStore as createStore,
   applyMiddleware,
-  compose
+  compose,
 } from "redux";
 import thunk from "redux-thunk";
-import { reducers } from "../reducers";
+import reducers from "../reducers";
 
 function saveToLocalStorage(store) {
   try {
@@ -21,7 +21,6 @@ function loadFromLocalStorage() {
     if (serializedStore === null) return undefined;
     return JSON.parse(serializedStore);
   } catch (e) {
-    console.log(e);
     return undefined;
   }
 }

@@ -14,9 +14,8 @@ import {
 } from "@mui/material";
 export default function Sidebar() {
   const location = useLocation();
-  const { image, lastName } = useSelector(
-    (state) => state.authReducer.authData
-  );
+  const { user } = useSelector((state) => state.auth);
+  const { image, lastName } = user;
   const lstMenu = [
     {
       header: "Tổng quan",

@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import DesignNew from "./pages/DesignNew";
 import { useSelector } from "react-redux";
 export default function App() {
-  const user = useSelector((state) => state.authReducer.authData);
+  const { user } = useSelector((state) => state.auth);
   return (
     <Routes>
       <Route

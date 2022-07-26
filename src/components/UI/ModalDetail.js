@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 // ?REDUX
 import { useDispatch, useSelector } from "react-redux";
-import { getAllUser } from "../../actions/UserActions";
+import { getAllUser } from "../../redux/actions/UserActions";
+import { addUserToDocument } from "../../redux/actions/DocumentAction";
 
 import moment from "moment";
 import DocumentDesign from "../../models/DesignDocument";
@@ -21,7 +22,7 @@ import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Avatar from "@mui/material/Avatar";
 
-import { addUserToDocument } from "../../actions/DesignActions";
+// import { addUserToDocument } from "../../actions/DesignActions";
 
 const initDocumentDesign = new DocumentDesign({});
 const initUser = new User({});
@@ -30,30 +31,35 @@ export default function ModalDetail({
   selectedValue = initDocumentDesign,
   open,
 }) {
-  const { lstUser } = useSelector((state) => state.userReducer);
-  const { authData } = useSelector((state) => state.authReducer);
   const [name, setName] = useState("");
+
+  const { listUser } = useSelector((state) => state.listUser);
+  const { loading, successMessage } = useSelector((state) => state.document);
+  const { user } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
   useEffect(() => {
-    if (authData && authData.token) {
-      dispatch(getAllUser(authData.token));
+    if (user && user.token) {
+      dispatch(getAllUser(user.token));
     }
-  }, [authData, dispatch]);
+  }, [user, dispatch]);
 
   const handleChange = (event) => {
     setName((prev) => event.target.value);
+  };
+  const handleReset = () => {
+    handleClose();
+    setName((prev) => "");
   };
   const handleClickSave = () => {
     const { id } = selectedValue;
     if (!id) {
       setName((prev) => "");
     } else {
-      dispatch(addUserToDocument(authData.token, id, name));
-      setName((prev) => "");
-      handleClose();
+      dispatch(addUserToDocument(user.token, id, name, handleReset));
     }
   };
+
   return (
     <Dialog
       open={open}
@@ -75,7 +81,7 @@ export default function ModalDetail({
                 Ngày nhận
               </Typography>
               <Typography variant="body1" display="block">
-                {moment(selectedValue.ngayNhan).format("DD/MM/yyyy")}
+                {moment(selectedValue?.ngayNhan).format("DD/MM/yyyy")}
               </Typography>
             </Stack>
             <Stack sx={{ flex: 1 }}>
@@ -83,7 +89,7 @@ export default function ModalDetail({
                 Ngày trả
               </Typography>
               <Typography variant="body1" display="block">
-                {moment(selectedValue.ngayTra).format("DD/MM/yyyy")}
+                {moment(selectedValue?.ngayTra).format("DD/MM/yyyy")}
               </Typography>
             </Stack>
           </Stack>
@@ -92,7 +98,7 @@ export default function ModalDetail({
               Tên dự án/công trình
             </Typography>
             <Typography variant="body1" display="block">
-              {selectedValue.congTrinh}
+              {selectedValue?.congTrinh}
             </Typography>
           </Stack>
           <Stack>
@@ -100,7 +106,7 @@ export default function ModalDetail({
               Địa điểm xây dựng
             </Typography>
             <Typography variant="body1" display="block">
-              {selectedValue.diaDiem}
+              {selectedValue?.diaDiem}
             </Typography>
           </Stack>
           <Stack>
@@ -108,7 +114,7 @@ export default function ModalDetail({
               Chủ đầu tư
             </Typography>
             <Typography variant="body1" display="block">
-              {selectedValue.chuDauTu}
+              {selectedValue?.chuDauTu}
             </Typography>
           </Stack>
           <Stack>
@@ -116,7 +122,7 @@ export default function ModalDetail({
               Đơn vị tư vấn thiết kế
             </Typography>
             <Typography variant="body1" display="block">
-              {selectedValue.donViTK}
+              {selectedValue?.donViTK}
             </Typography>
           </Stack>
           <Stack>
@@ -124,19 +130,21 @@ export default function ModalDetail({
               Cán bộ thụ lý
             </Typography>
             <Select value={name} onChange={handleChange} displayEmpty>
-              <MenuItem value="">
+              <MenuItem value="" sx={{ py: 2 }}>
                 <em>Chọn tên cán bộ</em>
               </MenuItem>
-              {lstUser.map((item = initUser) => (
-                <MenuItem value={item.id} key={item.id}>
-                  <Stack direction="row" alignItems="center" spacing={2}>
-                    <Avatar alt={item.lastName} src={item.image} />
-                    <Typography variant="body1" display="block">
-                      {item.lastName}
-                    </Typography>
-                  </Stack>
-                </MenuItem>
-              ))}
+              {listUser.map((user = initUser) =>
+                user.enabled === 1 ? (
+                  <MenuItem value={user.id} key={user.id}>
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <Avatar alt={user.lastName} src={user.image} />
+                      <Typography variant="body1" display="block">
+                        {user.lastName}
+                      </Typography>
+                    </Stack>
+                  </MenuItem>
+                ) : null
+              )}
             </Select>
           </Stack>
         </Stack>
@@ -145,7 +153,7 @@ export default function ModalDetail({
         <Button
           variant="outlined"
           color="error"
-          sx={{ width: 100 }}
+          sx={{ width: 130 }}
           onClick={() => {
             setName((prev) => "");
             handleClose();
@@ -154,14 +162,16 @@ export default function ModalDetail({
           Đóng
         </Button>
         <LoadingButton
+          loading={loading}
           variant="contained"
+          loadingIndicator="Đang xử lý.."
           color="success"
-          sx={{ width: 100 }}
+          sx={{ width: 180 }}
           autoFocus
           disabled={name === ""}
           onClick={handleClickSave}
         >
-          Lưu
+          Chuyển hồ sơ
         </LoadingButton>
       </DialogActions>
     </Dialog>

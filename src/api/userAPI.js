@@ -7,7 +7,7 @@ class UserAPI {
       { token },
       {
         params: {
-          v: "auth",
+          v: "canbo",
           m: "get",
         },
       }

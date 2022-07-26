@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getNewDesignAction,
-  resetMessageSucess,
-} from "../actions/DesignActions";
-import DesignDocument from "../models/DesignDocument";
+  resetListDocumentMessage,
+} from "../redux/actions/DocumentAction";
 
 import styled from "styled-components";
 import moment from "moment";
@@ -38,23 +37,21 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 export default function DesignNew() {
-  const designDocument = new DesignDocument({});
   const [openModal, setOpenModal] = useState(false);
+  const [select, setSelect] = useState(null);
 
-  const [select, setSelect] = useState(designDocument);
-
-  const { authData } = useSelector((state) => state.authReducer);
-  const { arrData, loading, messageSuccess, messageError } = useSelector(
-    (state) => state.designReducer
+  const { user } = useSelector((state) => state.auth);
+  const { listDocument, loading, errorMessage, successMessage } = useSelector(
+    (state) => state.listDocument
   );
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (authData && authData.token) {
-      dispatch(getNewDesignAction(authData.token));
+    if (user && user.token && !openModal) {
+      dispatch(getNewDesignAction(user.token));
     }
-  }, [authData, dispatch]);
+  }, [user, dispatch, openModal]);
 
   const handleClickOpen = () => {
     setOpenModal(true);
@@ -63,11 +60,8 @@ export default function DesignNew() {
   const handleClose = () => {
     setOpenModal(false);
   };
-  const handleClickAdd = (obj = designDocument) => {
+  const handleClickAdd = (obj) => {
     setSelect((prev) => obj);
-  };
-  const handleCloseAlert = () => {
-    dispatch(resetMessageSucess());
   };
   const headers = [
     { field: "id", name: "ID", width: 5 },
@@ -92,7 +86,7 @@ export default function DesignNew() {
   );
 
   const renderRowData = () =>
-    arrData.map((data) => {
+    listDocument.map((data) => {
       return (
         <TableRow key={data.id}>
           {headers.map((header) => {
@@ -161,10 +155,10 @@ export default function DesignNew() {
         <Typography variant="h6" component="h1" sx={{ color: "#2f80db" }}>
           Hồ thẩm duyệt sơ mới
         </Typography>
-        <Chip label={`${arrData.length} hồ sơ`} color="primary" />
+        <Chip label={`${listDocument.length} hồ sơ`} color="primary" />
       </Stack>
       <TableContainer component={Paper} sx={{ position: "relative" }}>
-        {arrData.length !== 0 && (
+        {listDocument.length !== 0 && (
           <Backdrop
             sx={{ color: "#fff", zIndex: 1, position: "absolute" }}
             open={loading}
@@ -175,7 +169,7 @@ export default function DesignNew() {
         <Table size="medium">
           <TableHead>{renderHeader()}</TableHead>
           <TableBody>
-            {arrData.length === 0 ? renderSkeletonRow() : renderRowData()}
+            {listDocument.length === 0 ? renderSkeletonRow() : renderRowData()}
           </TableBody>
         </Table>
       </TableContainer>
@@ -185,31 +179,31 @@ export default function DesignNew() {
         handleClose={handleClose}
       />
       <Snackbar
-        open={messageSuccess !== ""}
-        autoHideDuration={6000}
-        onClose={handleCloseAlert}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={successMessage !== ""}
+        autoHideDuration={4000}
+        anchorOrigin={{ horizontal: "center", vertical: "top" }}
+        onClose={() => dispatch(resetListDocumentMessage())}
       >
         <Alert
           severity="success"
           sx={{ width: "100%" }}
-          onClose={handleCloseAlert}
+          onClose={() => dispatch(resetListDocumentMessage())}
         >
-          {messageSuccess}
+          {successMessage}
         </Alert>
       </Snackbar>
       <Snackbar
-        open={messageError !== ""}
-        autoHideDuration={6000}
-        onClose={handleCloseAlert}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={errorMessage !== ""}
+        autoHideDuration={4000}
+        anchorOrigin={{ horizontal: "center", vertical: "top" }}
+        onClose={() => dispatch(resetListDocumentMessage())}
       >
         <Alert
           severity="error"
           sx={{ width: "100%" }}
-          onClose={handleCloseAlert}
+          onClose={() => dispatch(resetListDocumentMessage())}
         >
-          {messageError}
+          {errorMessage}
         </Alert>
       </Snackbar>
     </Container>
