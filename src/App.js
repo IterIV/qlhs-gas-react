@@ -5,6 +5,7 @@ import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import DesignNew from "./pages/DesignNew";
 import { useSelector } from "react-redux";
+import AddNewDocument from "./pages/AddNewDocument";
 export default function App() {
   const { user } = useSelector((state) => state.auth);
   return (
@@ -22,6 +23,7 @@ export default function App() {
       >
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="design/new" element={<DesignNew />} />
+        <Route path="design/add" element={<AddNewDocument />} />
       </Route>
 
       <Route

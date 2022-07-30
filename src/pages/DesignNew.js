@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   getNewDesignAction,
   resetListDocumentMessage,
@@ -18,7 +19,7 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-
+import Button from "@mui/material/Button";
 // Table
 import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
@@ -26,11 +27,13 @@ import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
+import TablePagination from "@mui/material/TablePagination";
 
 // ICON MATERIAL
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import ModalDetail from "../components/UI/ModalDetail";
+import PostAddIcon from "@mui/icons-material/PostAdd";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -39,6 +42,16 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 export default function DesignNew() {
   const [openModal, setOpenModal] = useState(false);
   const [select, setSelect] = useState(null);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [page, setPage] = useState(0);
+  let navigate = useNavigate();
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const { user } = useSelector((state) => state.auth);
   const { listDocument, loading, errorMessage, successMessage } = useSelector(
@@ -86,53 +99,55 @@ export default function DesignNew() {
   );
 
   const renderRowData = () =>
-    listDocument.map((data) => {
-      return (
-        <TableRow key={data.id}>
-          {headers.map((header) => {
-            if (header.field === "settings") {
+    listDocument
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      .map((data) => {
+        return (
+          <TableRow key={data.id}>
+            {headers.map((header) => {
+              if (header.field === "settings") {
+                return (
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    key={header.field}
+                    sx={{ width: `${header.width}%` }}
+                  >
+                    <IconButton
+                      color="success"
+                      component="label"
+                      onClick={() => {
+                        handleClickAdd(data);
+                        handleClickOpen();
+                      }}
+                    >
+                      <PersonAddAlt1Icon />
+                    </IconButton>
+                    <IconButton color="error" component="label">
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                );
+              }
               return (
                 <TableCell
                   component="th"
                   scope="row"
                   key={header.field}
-                  sx={{ width: `${header.width}%` }}
+                  sx={{
+                    width: `${header.width}%`,
+                    fontWeight: `${header.field === "id" ? "bold" : "400"}`,
+                  }}
                 >
-                  <IconButton
-                    color="success"
-                    component="label"
-                    onClick={() => {
-                      handleClickAdd(data);
-                      handleClickOpen();
-                    }}
-                  >
-                    <PersonAddAlt1Icon />
-                  </IconButton>
-                  <IconButton color="error" component="label">
-                    <DeleteIcon />
-                  </IconButton>
+                  {header.field === "ngayNhan" || header.field === "ngayTra"
+                    ? moment(data[header.field]).format("DD/MM/yyyy")
+                    : data[header.field]}
                 </TableCell>
               );
-            }
-            return (
-              <TableCell
-                component="th"
-                scope="row"
-                key={header.field}
-                sx={{
-                  width: `${header.width}%`,
-                  fontWeight: `${header.field === "id" ? "bold" : "400"}`,
-                }}
-              >
-                {header.field === "ngayNhan" || header.field === "ngayTra"
-                  ? moment(data[header.field]).format("DD/MM/yyyy")
-                  : data[header.field]}
-              </TableCell>
-            );
-          })}
-        </TableRow>
-      );
-    });
+            })}
+          </TableRow>
+        );
+      });
 
   const renderSkeletonRow = () => (
     <TableRow>
@@ -151,12 +166,25 @@ export default function DesignNew() {
 
   return (
     <Container>
-      <Stack direction="row" spacing={1} mb={2}>
-        <Typography variant="h6" component="h1" sx={{ color: "#2f80db" }}>
-          Hồ thẩm duyệt sơ mới
-        </Typography>
-        <Chip label={`${listDocument.length} hồ sơ`} color="primary" />
+      <Stack direction="row" justifyContent="space-between" mb={2}>
+        <Stack direction="row" spacing={1}>
+          <Typography variant="h6" component="h1" sx={{ color: "#2f80db" }}>
+            Hồ thẩm duyệt sơ mới
+          </Typography>
+          <Chip label={`${listDocument.length} hồ sơ`} color="primary" />
+        </Stack>
+        <Button
+          variant="contained"
+          color="success"
+          startIcon={<PostAddIcon />}
+          onClick={() => {
+            navigate("../design/add", { replace: true });
+          }}
+        >
+          Thêm mới
+        </Button>
       </Stack>
+
       <TableContainer component={Paper} sx={{ position: "relative" }}>
         {listDocument.length !== 0 && (
           <Backdrop
@@ -173,6 +201,21 @@ export default function DesignNew() {
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        labelRowsPerPage="Tổng dữ liệu trên một trang"
+        labelDisplayedRows={({ from, to, count }) =>
+          `Từ ${from} đến ${to} / ${
+            count !== -1 ? `${count} trang` : `more than ${to}`
+          }`
+        }
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={listDocument.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
       <ModalDetail
         selectedValue={select}
         open={openModal}

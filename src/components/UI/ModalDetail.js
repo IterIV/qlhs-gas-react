@@ -34,7 +34,7 @@ export default function ModalDetail({
   const [name, setName] = useState("");
 
   const { listUser } = useSelector((state) => state.listUser);
-  const { loading, successMessage } = useSelector((state) => state.document);
+  const { loading } = useSelector((state) => state.document);
   const { user } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();

@@ -5,17 +5,21 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import store from "./redux/store";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <Routes>
-        <Route path="*" element={<App />} />
-      </Routes>
-    </BrowserRouter>
-  </Provider>
+  <LocalizationProvider dateAdapter={AdapterMoment}>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="*" element={<App />} />
+        </Routes>
+      </BrowserRouter>
+    </Provider>
+  </LocalizationProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

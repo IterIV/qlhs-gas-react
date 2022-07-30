@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import GridViewIcon from "@mui/icons-material/GridView";
 import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
@@ -15,6 +15,7 @@ import {
 export default function Sidebar() {
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
+  let navigate = useNavigate();
   const { image, lastName } = user;
   const lstMenu = [
     {
@@ -68,7 +69,12 @@ export default function Sidebar() {
         >
           {menu.items.map((item, index1) => {
             return (
-              <ListItemButton key={`h${index}_item${index1}`}>
+              <ListItemButton
+                key={`h${index}_item${index1}`}
+                onClick={() => {
+                  navigate(item.path, { replace: true });
+                }}
+              >
                 <ListItemIcon
                   sx={
                     location.pathname === `/home/${item.path}`
@@ -79,18 +85,12 @@ export default function Sidebar() {
                   {item.icon}
                 </ListItemIcon>
                 <ListItemText
-                  primary={
-                    <Link
-                      className={
-                        location.pathname === `/home/${item.path}`
-                          ? "active"
-                          : ""
-                      }
-                      to={item.path}
-                    >
-                      {item.title}
-                    </Link>
+                  sx={
+                    location.pathname === `/home/${item.path}`
+                      ? { color: "#275b9a", fontWeight: "bold !important" }
+                      : {}
                   }
+                  primary={item.title}
                 />
               </ListItemButton>
             );
