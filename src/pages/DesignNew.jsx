@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
+  deleteDocument,
   getNewDesignAction,
   resetListDocumentMessage,
 } from "../redux/actions/DocumentAction";
@@ -34,6 +35,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import ModalDetail from "../components/UI/ModalDetail";
 import PostAddIcon from "@mui/icons-material/PostAdd";
+import DialogConfirm from "../components/UI/DialogConfirm";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -41,6 +43,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 export default function DesignNew() {
   const [openModal, setOpenModal] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [select, setSelect] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
@@ -123,7 +126,14 @@ export default function DesignNew() {
                     >
                       <PersonAddAlt1Icon />
                     </IconButton>
-                    <IconButton color="error" component="label">
+                    <IconButton
+                      color="error"
+                      component="label"
+                      onClick={() => {
+                        setSelect((prev) => data);
+                        setOpenDialog((prev) => !prev);
+                      }}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
@@ -215,6 +225,16 @@ export default function DesignNew() {
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+      <DialogConfirm
+        title={"Thông báo"}
+        message={"Đồng ý xóa hồ sơ này không?"}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        handleOK={() => {
+          dispatch(deleteDocument(user.token, select.id));
+          setOpenDialog((prev) => !prev);
+        }}
       />
       <ModalDetail
         selectedValue={select}

@@ -27,6 +27,30 @@ class DesignAPI {
       }
     );
   };
+  addNewDocument = (token, document) => {
+    return axiosClient.post(
+      "",
+      { token, ...document },
+      {
+        params: {
+          v: "hosotd",
+          m: "post",
+        },
+      }
+    );
+  };
+  delete = (token, id) => {
+    return axiosClient.post(
+      "",
+      { token, id },
+      {
+        params: {
+          v: "hosotd",
+          m: "delete",
+        },
+      }
+    );
+  };
 }
 const designAPI = new DesignAPI();
 export default designAPI;

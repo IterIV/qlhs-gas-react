@@ -17,6 +17,19 @@ const listDocumentReducer = (state = initState, { type, payload }) => {
         errorMessage: "",
         successMessage: message,
       };
+    case listDocumentTypes.DELETE_DOCUMENT: {
+      const { message, data } = payload;
+      const newList = state.listDocument.filter(
+        (document) => document.id !== data.id
+      );
+      return {
+        ...state,
+        loading: false,
+        errorMessage: "",
+        listDocument: newList,
+        successMessage: message,
+      };
+    }
     case listDocumentTypes.FETCH_FAIL: {
       const { message } = payload;
       return {
@@ -26,6 +39,7 @@ const listDocumentReducer = (state = initState, { type, payload }) => {
         successMessage: "",
       };
     }
+
     case listDocumentTypes.RESET_MESSAGE:
       return { ...state, errorMessage: "", successMessage: "" };
     default:

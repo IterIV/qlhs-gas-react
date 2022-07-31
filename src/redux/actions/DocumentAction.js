@@ -34,6 +34,20 @@ export const resetListDocumentMessage = () => ({
   type: listDocumentTypes.RESET_MESSAGE,
 });
 
+export const deleteDocument = (token, id) => async (dispatch) => {
+  dispatch(startFecthList());
+  try {
+    const payload = await designAPI.delete(token, id);
+    if (!payload.success) {
+      dispatch(fetchListFail(payload));
+    } else {
+      dispatch({ type: listDocumentTypes.DELETE_DOCUMENT, payload });
+    }
+  } catch (error) {
+    const payload = { success: false, data: null, message: error.message };
+    dispatch(fetchListFail(payload));
+  }
+};
 // DOCUMENT =====================================
 const startFecthDocument = () => ({ type: documentTypes.START_FETCH });
 const fetchDocumentFail = (
@@ -48,6 +62,7 @@ const updateDocumentSuccess = (
   type: documentTypes.UPDATE_SUCCESS,
   payload,
 });
+
 export const addUserToDocument =
   (token, id, userID, handleReset) => async (dispatch) => {
     dispatch(startFecthDocument());
@@ -64,6 +79,24 @@ export const addUserToDocument =
       dispatch(fetchDocumentFail(payload));
     }
   };
+
+export const addNewDocument =
+  (token, document, navigate) => async (dispatch) => {
+    dispatch(startFecthDocument());
+    try {
+      const payload = await designAPI.addNewDocument(token, document);
+      if (!payload.success) {
+        dispatch(fetchDocumentFail(payload));
+      } else {
+        dispatch(updateDocumentSuccess(payload));
+        navigate("../design/new", { replace: true });
+      }
+    } catch (error) {
+      const payload = { success: false, data: null, message: error.message };
+      dispatch(fetchDocumentFail(payload));
+    }
+  };
+
 export const resetDocumentMessage = () => ({
   type: documentTypes.RESET_MESSAGE,
 });
