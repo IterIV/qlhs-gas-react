@@ -1,15 +1,16 @@
 import axiosClient from "./axiosClient";
 
-class AuthAPI {
-  login = (data) => {
-    const url = "";
-    return axiosClient.post(url, data, {
-      params: {
-        v: "auth",
-        m: "post"
+export default class AuthAPI {
+  login(user) {
+    return axiosClient.post(
+      "",
+      { ...user },
+      {
+        params: {
+          v: "auth",
+          m: "login",
+        },
       }
-    });
-  };
+    );
+  }
 }
-const authApi = new AuthAPI();
-export default authApi;

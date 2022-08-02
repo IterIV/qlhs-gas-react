@@ -1,7 +1,6 @@
 export const authTypes = {
-  START_LOGIN: "startLogin",
-  LOGIN_SUCCESS: "loginSuccess",
-  LOGIN_FAIL: "loginFailure",
-  LOG_OUT: "logOut",
-  RESET_MESSAGE: "resetMessage",
+  START_LOGIN: "AUTH_START",
+  LOGIN_SUCCESS: "AUTH_SUCCESS",
+  LOGIN_FAIL: "AUTH_FAIL",
+  LOG_OUT: "AUTH_LOGOUT",
 };

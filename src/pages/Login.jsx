@@ -1,27 +1,19 @@
-import { forwardRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { loginAction, resetMessage } from "../../redux/actions/AuthActions";
+import { login } from "../redux/actions/authActions";
 
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Stack from "@mui/material/Stack";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
-
+import LoginIcon from "@mui/icons-material/Login";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import styled from "styled-components";
-
-const Alert = forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import { Box, Paper } from "@mui/material";
+import DialogMessage from "../components/DialogMessage";
 
 export default function Login() {
-  const { loading, successMessage, errorMessage } = useSelector(
-    (state) => state.auth
-  );
+  const { loading, errorMessage } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -37,14 +29,18 @@ export default function Login() {
       password: Yup.string().required("Mật khẩu không để trống"),
     }),
     onSubmit: (values) => {
-      dispatch({ type: "RESET_STATE" });
-      dispatch(loginAction(values, navigate));
+      dispatch(login(values, navigate));
     },
   });
 
   return (
-    <Container>
-      <div className="login__content">
+    <Box
+      display="flex"
+      sx={{ width: "100vw", height: "100vh", background: "#eee" }}
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Paper sx={{ p: 3, width: "350px" }} elevation={0}>
         <Typography variant="h6" component="h1" align="center" sx={{ mb: 2 }}>
           Đăng nhập
         </Typography>
@@ -52,7 +48,6 @@ export default function Login() {
           <Stack spacing={3}>
             <TextField
               fullWidth
-              id="email"
               name="email"
               type="email"
               label="Email"
@@ -64,7 +59,6 @@ export default function Login() {
 
             <TextField
               fullWidth
-              id="password"
               name="password"
               type="password"
               label="Mật khẩu"
@@ -76,68 +70,21 @@ export default function Login() {
           </Stack>
           <LoadingButton
             loading={loading}
-            loadingIndicator="Đang kết nối..."
+            loadingPosition="start"
             fullWidth
             type="submit"
             variant="contained"
             size="large"
             sx={{ mt: 2 }}
+            startIcon={<LoginIcon />}
           >
             Đăng nhập
           </LoadingButton>
         </form>
-      </div>
-
-      <Snackbar
-        open={successMessage !== ""}
-        autoHideDuration={4000}
-        anchorOrigin={{ horizontal: "center", vertical: "top" }}
-        onClose={() => dispatch(resetMessage())}
-      >
-        <Alert
-          severity="success"
-          sx={{ width: "100%" }}
-          onClose={() => dispatch(resetMessage())}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={errorMessage !== ""}
-        autoHideDuration={4000}
-        anchorOrigin={{ horizontal: "center", vertical: "top" }}
-        onClose={() => dispatch(resetMessage())}
-      >
-        <Alert
-          severity="error"
-          sx={{ width: "100%" }}
-          onClose={() => dispatch(resetMessage())}
-        >
-          {errorMessage}
-        </Alert>
-      </Snackbar>
-    </Container>
+      </Paper>
+      {errorMessage !== "" && (
+        <DialogMessage message={errorMessage} type="error" />
+      )}
+    </Box>
   );
 }
-
-const Container = styled.div`
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #eee;
-  .login__content {
-    width: 300px;
-    background-color: white;
-    border-radius: 5px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-  .login__content > p {
-    text-align: center;
-    font-weight: 700;
-    font-size: 18px;
-  }
-`;

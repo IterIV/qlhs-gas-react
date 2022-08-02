@@ -1,29 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  deleteDocument,
-  getNewDesignAction,
-  resetListDocumentMessage,
-} from "../redux/actions/DocumentAction";
-
+import { useDispatch, useSelector } from "react-redux";
+import { getNew } from "../redux/actions/documentActions";
 import styled from "styled-components";
 import moment from "moment";
 
 import Typography from "@mui/material/Typography";
-import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import Skeleton from "@mui/material/Skeleton";
-import IconButton from "@mui/material/IconButton";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 // Table
 import Table from "@mui/material/Table";
-import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
@@ -31,22 +19,14 @@ import TableCell from "@mui/material/TableCell";
 import TablePagination from "@mui/material/TablePagination";
 
 // ICON MATERIAL
-import DeleteIcon from "@mui/icons-material/Delete";
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
-import ModalDetail from "../components/UI/ModalDetail";
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import DialogConfirm from "../components/UI/DialogConfirm";
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import DropdownUsers from "../components/DropdownUsers";
+import DialogMessage from "../components/DialogMessage";
 
 export default function DesignNew() {
-  const [openModal, setOpenModal] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [select, setSelect] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
+
   let navigate = useNavigate();
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -56,37 +36,22 @@ export default function DesignNew() {
     setPage(0);
   };
 
-  const { user } = useSelector((state) => state.auth);
-  const { listDocument, loading, errorMessage, successMessage } = useSelector(
-    (state) => state.listDocument
+  const { token } = useSelector((state) => state.auth);
+  const { listDocuments, errorMessage, successMessage } = useSelector(
+    (state) => state.document
   );
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (user && user.token && !openModal) {
-      dispatch(getNewDesignAction(user.token));
-    }
-  }, [user, dispatch, openModal]);
-
-  const handleClickOpen = () => {
-    setOpenModal(true);
-  };
-
-  const handleClose = () => {
-    setOpenModal(false);
-  };
-  const handleClickAdd = (obj) => {
-    setSelect((prev) => obj);
-  };
+    dispatch(getNew(token));
+  }, [token, dispatch]);
   const headers = [
-    { field: "id", name: "ID", width: 5 },
-    { field: "congTrinh", name: "Tên công trình", width: 20 },
-    { field: "chuDauTu", name: "Chủ đầu tư", width: 15 },
-    { field: "donViTK", name: "Đơn vị tư vấn thiết kế", width: 15 },
-    { field: "ngayNhan", name: "Ngày nhận", width: 10 },
-    { field: "ngayTra", name: "Ngày trả", width: 10 },
-    { field: "settings", name: "Chức năng", width: 15 },
+    { name: "ID", width: 10 },
+    { name: "Thời gian nhận/trả", width: 15 },
+    { name: "Thông tin dự án", width: 30 },
+    { name: "Chủ đầu tư", width: 25 },
+    { name: "Chức năng", width: 20 },
   ];
 
   const renderHeader = () => (
@@ -101,174 +66,103 @@ export default function DesignNew() {
     </TableRow>
   );
 
-  const renderRowData = () =>
-    listDocument
-      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-      .map((data) => {
-        return (
-          <TableRow key={data.id}>
-            {headers.map((header) => {
-              if (header.field === "settings") {
-                return (
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    key={header.field}
-                    sx={{ width: `${header.width}%` }}
-                  >
-                    <IconButton
-                      color="success"
-                      component="label"
-                      onClick={() => {
-                        handleClickAdd(data);
-                        handleClickOpen();
-                      }}
-                    >
-                      <PersonAddAlt1Icon />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      component="label"
-                      onClick={() => {
-                        setSelect((prev) => data);
-                        setOpenDialog((prev) => !prev);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                );
-              }
-              return (
-                <TableCell
-                  component="th"
-                  scope="row"
-                  key={header.field}
-                  sx={{
-                    width: `${header.width}%`,
-                    fontWeight: `${header.field === "id" ? "bold" : "400"}`,
-                  }}
-                >
-                  {header.field === "ngayNhan" || header.field === "ngayTra"
-                    ? moment(data[header.field]).format("DD/MM/yyyy")
-                    : data[header.field]}
-                </TableCell>
-              );
-            })}
-          </TableRow>
-        );
-      });
-
-  const renderSkeletonRow = () => (
-    <TableRow>
-      {headers.map((header) => (
+  const renderRowData = () => {
+    if (listDocuments.length === 0) {
+      return (
+        <TableRow key={document.id}>
+          <TableCell colSpan={7}>
+            <Typography variant="body1" align="center">
+              Không có hồ sơ mới
+            </Typography>
+          </TableCell>
+        </TableRow>
+      );
+    }
+    if (listDocuments[0].id === "") {
+      return headers.map((header, index) => (
         <TableCell
           component="th"
           scope="row"
-          key={header.field}
+          key={`header_${index}`}
           sx={{ width: `${header.width}%` }}
         >
           <Skeleton variant="text" height={40} />
         </TableCell>
-      ))}
-    </TableRow>
-  );
+      ));
+    }
+    return listDocuments
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      .map((document) => {
+        return (
+          <TableRow key={document.id}>
+            <TableCell sx={{ fontWeight: "bold" }}>{document.id}</TableCell>
+            <TableCell>
+              <Typography variant="body1">
+                {moment(document.startTime).format("DD/MM/YYYY HH:mm")}
+              </Typography>
+              <Typography variant="body1">
+                {moment(document.endTime).format("DD/MM/YYYY HH:mm")}
+              </Typography>
+            </TableCell>
+            <TableCell>
+              <Typography variant="body1" sx={{ fontWeight: "500" }}>
+                {document.building}
+              </Typography>
+              <Typography variant="body2">{document.detail}</Typography>
+            </TableCell>
+            <TableCell>{document.investor}</TableCell>
+            <TableCell>
+              <DropdownUsers />
+            </TableCell>
+          </TableRow>
+        );
+      });
+  };
 
   return (
     <Container>
-      <Stack direction="row" justifyContent="space-between" mb={2}>
-        <Stack direction="row" spacing={1}>
-          <Typography variant="h6" component="h1" sx={{ color: "#2f80db" }}>
-            Hồ thẩm duyệt sơ mới
-          </Typography>
-          <Chip label={`${listDocument.length} hồ sơ`} color="primary" />
-        </Stack>
-        <Button
-          variant="contained"
-          color="success"
-          startIcon={<PostAddIcon />}
-          onClick={() => {
-            navigate("../design/add", { replace: true });
-          }}
-        >
-          Thêm mới
-        </Button>
-      </Stack>
-
-      <TableContainer component={Paper} sx={{ position: "relative" }}>
-        {listDocument.length !== 0 && (
-          <Backdrop
-            sx={{ color: "#fff", zIndex: 1, position: "absolute" }}
-            open={loading}
+      <Typography variant="h6" component="h1" sx={{ color: "#2f80db", mb: 2 }}>
+        Hồ thẩm duyệt sơ mới
+      </Typography>
+      <Paper elevation={1} sx={{ p: 2 }}>
+        <Stack direction="row" justifyContent="space-between" mb={2}>
+          <Stack direction="row" spacing={1}>
+            <Typography variant="h6">Danh sách hồ sơ</Typography>
+          </Stack>
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<PostAddIcon />}
+            onClick={() => {
+              navigate("../design/add", { replace: true });
+            }}
           >
-            <CircularProgress color="inherit" />
-          </Backdrop>
-        )}
+            Thêm mới
+          </Button>
+        </Stack>
         <Table size="medium">
           <TableHead>{renderHeader()}</TableHead>
-          <TableBody>
-            {listDocument.length === 0 ? renderSkeletonRow() : renderRowData()}
-          </TableBody>
+          <TableBody>{renderRowData()}</TableBody>
         </Table>
-      </TableContainer>
-      <TablePagination
-        labelRowsPerPage="Tổng dữ liệu trên một trang"
-        labelDisplayedRows={({ from, to, count }) =>
-          `Từ ${from} đến ${to} / ${
-            count !== -1 ? `${count} trang` : `more than ${to}`
-          }`
-        }
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={listDocument.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-      <DialogConfirm
-        title={"Thông báo"}
-        message={"Đồng ý xóa hồ sơ này không?"}
-        open={openDialog}
-        setOpen={setOpenDialog}
-        handleOK={() => {
-          dispatch(deleteDocument(user.token, select.id));
-          setOpenDialog((prev) => !prev);
-        }}
-      />
-      <ModalDetail
-        selectedValue={select}
-        open={openModal}
-        handleClose={handleClose}
-      />
-      <Snackbar
-        open={successMessage !== ""}
-        autoHideDuration={4000}
-        anchorOrigin={{ horizontal: "center", vertical: "top" }}
-        onClose={() => dispatch(resetListDocumentMessage())}
-      >
-        <Alert
-          severity="success"
-          sx={{ width: "100%" }}
-          onClose={() => dispatch(resetListDocumentMessage())}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={errorMessage !== ""}
-        autoHideDuration={4000}
-        anchorOrigin={{ horizontal: "center", vertical: "top" }}
-        onClose={() => dispatch(resetListDocumentMessage())}
-      >
-        <Alert
-          severity="error"
-          sx={{ width: "100%" }}
-          onClose={() => dispatch(resetListDocumentMessage())}
-        >
-          {errorMessage}
-        </Alert>
-      </Snackbar>
+        <TablePagination
+          labelRowsPerPage="Tổng dữ liệu trên một trang"
+          labelDisplayedRows={({ from, to, count }) =>
+            `Từ ${from} đến ${to} / ${
+              count !== -1 ? `${count} trang` : `more than ${to}`
+            }`
+          }
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={listDocuments.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+
+      <DialogMessage message={errorMessage} type="error" />
+      <DialogMessage message={successMessage} type="success" />
     </Container>
   );
 }
@@ -280,12 +174,4 @@ const Container = styled.div`
   padding-top: 90px;
   padding-right: 20px;
   background-color: #fcfdff;
-  .css-apqrd9-MuiTableBody-root {
-    .css-1q1u3t4-MuiTableRow-root {
-      transition: 0.5s;
-    }
-    .css-1q1u3t4-MuiTableRow-root:hover {
-      background-color: #eee;
-    }
-  }
 `;

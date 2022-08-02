@@ -1,18 +1,16 @@
 import axiosClient from "./axiosClient";
 
-class UserAPI {
+export default class UserAPI {
   getAllUser = (token) => {
     return axiosClient.post(
       "",
       { token },
       {
         params: {
-          v: "canbo",
-          m: "get",
+          v: "user",
+          m: "get_all",
         },
       }
     );
   };
 }
-const userAPI = new UserAPI();
-export default userAPI;

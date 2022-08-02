@@ -11,39 +11,35 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import {
-  addNewDocument,
-  resetDocumentMessage,
-} from "../redux/actions/DocumentAction";
+import { addNew } from "../redux/actions/documentActions";
 import { useSelector, useDispatch } from "react-redux";
-import DialogMessage from "../components/UI/DialogMessage";
 const AddNewDocument = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
-  const { loading, errorMessage } = useSelector((state) => state.document);
+  const { token } = useSelector((state) => state.auth);
+  const { loading } = useSelector((state) => state.document);
 
   const formik = useFormik({
     initialValues: {
       id: "",
-      congTrinh: "",
-      hangMuc: "",
-      diaDiem: "",
-      chuDauTu: "",
-      ngayNhan: moment().format("YYYY-MM-DDTkk:mm"),
-      ngayTra: moment().format("YYYY-MM-DDTkk:mm"),
+      building: "",
+      detail: "",
+      address: "",
+      investor: "",
+      startTime: moment().format("YYYY-MM-DDTkk:mm"),
+      endTime: moment().format("YYYY-MM-DDTkk:mm"),
     },
     validationSchema: Yup.object().shape({
       id: Yup.string().required("Mã hồ sơ không để trống"),
-      congTrinh: Yup.string().required("Tên công trình, dự án không để trống"),
-      hangMuc: Yup.string().required("Hạng mục điều chỉnh không để trống"),
-      diaDiem: Yup.string().required("Địa điểm không để trống"),
-      chuDauTu: Yup.string().required("Chủ đầu tư không để trống"),
-      ngayNhan: Yup.string().required("Không để trống ngày nhận"),
-      ngayTra: Yup.string().required("Không để trống ngày trả"),
+      building: Yup.string().required("Tên công trình, dự án không để trống"),
+      detail: Yup.string().required("Hạng mục điều chỉnh không để trống"),
+      address: Yup.string().required("Địa điểm không để trống"),
+      investor: Yup.string().required("Chủ đầu tư không để trống"),
+      startTime: Yup.string().required("Không để trống ngày nhận"),
+      endTime: Yup.string().required("Không để trống ngày trả"),
     }),
     onSubmit: (values) => {
-      dispatch(addNewDocument(user.token, values, navigate));
+      dispatch(addNew(token, values, navigate));
     },
   });
 
@@ -78,74 +74,70 @@ const AddNewDocument = () => {
               />
               <TextField
                 fullWidth
-                name="ngayNhan"
+                name="startTime"
                 type="datetime-local"
                 label="Thời gian tiếp nhận"
-                value={formik.values.ngayNhan}
+                value={formik.values.startTime}
                 onChange={formik.handleChange}
                 error={
-                  formik.touched.ngayNhan && Boolean(formik.errors.ngayNhan)
+                  formik.touched.startTime && Boolean(formik.errors.startTime)
                 }
-                helperText={formik.touched.ngayNhan && formik.errors.ngayNhan}
+                helperText={formik.touched.startTime && formik.errors.startTime}
               />
               <TextField
                 fullWidth
-                name="ngayTra"
+                name="endTime"
                 type="datetime-local"
                 label="Thời gian hẹn trả"
-                value={formik.values.ngayTra}
+                value={formik.values.endTime}
                 onChange={formik.handleChange}
-                error={formik.touched.ngayTra && Boolean(formik.errors.ngayTra)}
-                helperText={formik.touched.ngayTra && formik.errors.ngayTra}
+                error={formik.touched.endTime && Boolean(formik.errors.endTime)}
+                helperText={formik.touched.endTime && formik.errors.endTime}
               />
             </Stack>
 
             <TextField
               fullWidth
-              name="congTrinh"
+              name="building"
               type="text"
               label="Tên công trình/dự án/phương tiện"
-              value={formik.values.congTrinh}
+              value={formik.values.building}
               onChange={formik.handleChange}
-              error={
-                formik.touched.congTrinh && Boolean(formik.errors.congTrinh)
-              }
-              helperText={formik.touched.congTrinh && formik.errors.congTrinh}
+              error={formik.touched.building && Boolean(formik.errors.building)}
+              helperText={formik.touched.building && formik.errors.building}
             />
             <TextField
               fullWidth
-              name="hangMuc"
+              name="detail"
               type="text"
               label="Hạng mục điều chỉnh, bổ sung"
-              value={formik.values.hangMuc}
+              value={formik.values.detail}
               onChange={formik.handleChange}
-              error={formik.touched.hangMuc && Boolean(formik.errors.hangMuc)}
-              helperText={formik.touched.hangMuc && formik.errors.hangMuc}
+              error={formik.touched.detail && Boolean(formik.errors.detail)}
+              helperText={formik.touched.detail && formik.errors.detail}
             />
             <TextField
               fullWidth
-              id="diaDiem"
-              name="diaDiem"
+              name="address"
               type="text"
               label="Địa điểm xây dựng (vùng hoạt động)"
-              value={formik.values.diaDiem}
+              value={formik.values.address}
               onChange={formik.handleChange}
-              error={formik.touched.diaDiem && Boolean(formik.errors.diaDiem)}
-              helperText={formik.touched.diaDiem && formik.errors.diaDiem}
+              error={formik.touched.address && Boolean(formik.errors.address)}
+              helperText={formik.touched.address && formik.errors.address}
             />
             <Stack>
               <TextField
                 fullWidth
-                id="chuDauTu"
-                name="chuDauTu"
+                name="investor"
                 type="text"
                 label="Chủ đầu tư"
-                value={formik.values.chuDauTu}
+                value={formik.values.investor}
                 onChange={formik.handleChange}
                 error={
-                  formik.touched.chuDauTu && Boolean(formik.errors.chuDauTu)
+                  formik.touched.investor && Boolean(formik.errors.investor)
                 }
-                helperText={formik.touched.chuDauTu && formik.errors.chuDauTu}
+                helperText={formik.touched.investor && formik.errors.investor}
               />
             </Stack>
 
@@ -164,11 +156,6 @@ const AddNewDocument = () => {
           </Stack>
         </form>
       </Paper>
-      <DialogMessage
-        message={errorMessage}
-        type="error"
-        handleClose={() => dispatch(resetDocumentMessage())}
-      />
     </Box>
   );
 };

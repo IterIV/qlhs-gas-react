@@ -1,5 +1,7 @@
 import "./index.css";
+import * as React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+
 import Login from "./pages/Login";
 import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/Dashboard";

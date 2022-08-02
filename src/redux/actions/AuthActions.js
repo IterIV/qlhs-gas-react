@@ -1,30 +1,35 @@
-import authApi from "../../api/authAPI";
+import AuthAPI from "../../api/AuthAPI";
 import { authTypes } from "../constains/authType";
+const authAPI = new AuthAPI();
 
-const startLogin = () => ({ type: authTypes.START_LOGIN });
-const loginFailure = (
-  payload = { success: false, data: null, message: "" }
-) => ({ type: authTypes.LOGIN_FAIL, payload });
-const loginSuccess = (payload = { success: true, data: {}, message: "" }) => ({
+const start = () => ({ type: authTypes.START_LOGIN });
+
+const fail = (payload) => ({
+  type: authTypes.LOGIN_FAIL,
+  payload,
+});
+
+const success = (payload) => ({
   type: authTypes.LOGIN_SUCCESS,
   payload,
 });
 
-export const loginAction = (userLogin, navigate) => async (dispatch) => {
-  dispatch(startLogin());
+export const login = (user, navigate) => async (dispatch) => {
+  dispatch(start());
   try {
-    const payload = await authApi.login(userLogin);
+    const payload = await authAPI.login(user);
     if (!payload.success) {
-      dispatch(loginFailure(payload));
+      dispatch(fail(payload));
     } else {
-      dispatch(loginSuccess(payload));
+      dispatch(success(payload));
       navigate("../home/dashboard", { replace: true });
     }
   } catch (error) {
     const payload = { success: false, data: null, message: error.message };
-    dispatch(loginFailure(payload));
+    dispatch(fail(payload));
   }
 };
 
 export const logoutAction = () => ({ type: authTypes.LOG_OUT });
+
 export const resetMessage = () => ({ type: authTypes.RESET_MESSAGE });

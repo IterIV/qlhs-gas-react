@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Button from "@mui/material/Button";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-import { logoutAction } from "../redux/actions/AuthActions";
+import { logoutAction } from "../redux/actions/authActions";
 
 export default function Header() {
   const dispatch = useDispatch();

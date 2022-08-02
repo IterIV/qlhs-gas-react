@@ -1,25 +1,36 @@
 import { documentTypes } from "../constains/documentType";
 const initState = {
+  listDocuments: [
+    {
+      id: "",
+      building: "",
+      detail: "",
+      address: "",
+      investor: "",
+      startTime: "",
+      endTime: "",
+      user: "",
+      loaiHinh: "",
+      nhomCongTrinh: "",
+      soVB: "",
+      loaiVB: "",
+      ngayVB: "",
+      thuPhi: "",
+    },
+  ],
   document: null,
   loading: false,
   errorMessage: "",
   successMessage: "",
 };
 
-const documentReducer = (state = initState, { type, payload }) => {
-  switch (type) {
-    case documentTypes.START_FETCH:
-      return { ...state, loading: true };
-    case documentTypes.UPDATE_SUCCESS:
-      const { message, data } = payload;
-      return {
-        document: { ...data },
-        loading: false,
-        errorMessage: "",
-        successMessage: message,
-      };
-    case documentTypes.FETCH_FAIL: {
-      const { message } = payload;
+const documentReducer = (state = initState, action) => {
+  switch (action.type) {
+    case documentTypes.START:
+      return { ...state, loading: true, errorMessage: "", successMessage: "" };
+
+    case documentTypes.FAIL: {
+      const { message } = action;
       return {
         ...state,
         loading: false,
@@ -27,8 +38,28 @@ const documentReducer = (state = initState, { type, payload }) => {
         successMessage: "",
       };
     }
-    case documentTypes.RESET_MESSAGE:
-      return { ...state, errorMessage: "", successMessage: "" };
+
+    case documentTypes.ADD_NEW:
+      const { message, data } = action;
+      return {
+        ...state,
+        document: { ...data },
+        loading: false,
+        errorMessage: "",
+        successMessage: message,
+      };
+
+    case documentTypes.GET_NEW: {
+      const { message, data } = action;
+      return {
+        ...state,
+        listDocuments: [...data],
+        loading: false,
+        errorMessage: "",
+        successMessage: message,
+      };
+    }
+
     default:
       return state;
   }
